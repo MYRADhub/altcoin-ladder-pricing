@@ -31,6 +31,14 @@ def main() -> Path:
         "kalshi": {"pairs": s["kalshi_bound"]["pairs"], "days": s["kalshi_bound"]["days_paired"], "violations": v["violations"],
                    "violationDays": v["days"], "flat": v["within_60s_and_flat"], "executable": v["all_three"]},
     }
+    co = ROOT / "results" / "crash_odds.json"
+    if co.exists():
+        c = json.loads(co.read_text())
+        payload["crash"] = {k: {"events": v["events"], **{m: r(b) for m, b in v["brier"].items()},
+                                "pMkt": r(v["tests"]["market minus history"].get("p_holm", v["tests"]["market minus history"]["p"]), 4),
+                                "pOpt": r(v["tests"]["options minus history"].get("p_holm", v["tests"]["options minus history"]["p"]), 4)}
+                            for k, v in [("all", c["primary_dip"]), ("daily", c["dip_by_kind"]["daily"]), ("weekly", c["dip_by_kind"]["weekly"]),
+                                         ("monthly", c["dip_by_kind"]["monthly"]), ("big", c["dip_5pct_or_more_below"])]}
     # In a standalone repo where this project is a subfolder next to the viewer, decks live at the repo root.
     base = ROOT.parent if (ROOT.parent / "viewer").is_dir() and (ROOT.parent / "presentations").is_dir() else ROOT
     out = base / "presentations" / "touch-markets" / "deck-data.js"

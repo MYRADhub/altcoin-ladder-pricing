@@ -5,6 +5,7 @@ const { Controls, Chips, Stats, chart, q } = Viewer.kit;
 const T = Touch;
 const D = DeckData;
 const P = D.premium;
+const C = D.crash;
 
 const pc = (v, d = 0) => `${(v * 100).toFixed(d)}%`;
 const cents = (v, d = 1) => `${v < 0 ? '-' : '+'}${Math.abs(v * 100).toFixed(d)}¢`;
@@ -175,10 +176,36 @@ const slides = [
     },
   },
   {
+    id: 'risk', kicker: 'For a risk platform', title: 'For crash odds, market prices beat history',
+    body: `<p>Risk models usually forecast from past volatility. A risk screen could instead show what the markets say: "the chance BTC dips to $80,000 this week".</p>
+      <p>I built the same touch probability three ways: from the crowd's price, from options, and from BTC's past volatility. On "will BTC dip to $X" markets, the crowd and options were each about <b>10% more accurate</b> than history (adjusted p ${pval(C.all.pMkt)}).</p>
+      <p>The edge is in daily and weekly windows. For monthly windows and drops of 5% or more, history did as well.</p>`,
+    deep: '<p>History here is the HAR volatility from Binance hourly returns over the last 1, 7 and 30 days, turned into a touch probability the same way as the options value. BTC fell over much of the sample, and all three forecasts underpriced dips in the middle of the range, so part of this is one falling year.</p>',
+    lab: `<div class="chips" id="r-win"></div><div class="chart"></div><div class="stats"></div>`,
+    init(root) {
+      const stats = Stats(q(root, '.stats'));
+      let k = 'all';
+      const r = () => {
+        const c = C[k];
+        const gain = (m) => (c.history - c[m]) * 1000;
+        const ms = [['market', 'Crowd', 'bad'], ['options', 'Options', 'cash']];
+        chart(q(root, '.chart'), {
+          alt: 'How much more accurate than history each forecast was', h: 220, x: [-0.6, 1.6], y: [-4, 14], zero: true, xl: '', xf: () => '', yl: 'Better than history, Brier ×1000', yf: (t) => t.toFixed(0),
+          bars: ms.map(([m, , col], i) => ({ x: i, y: gain(m), w: 56, c: col })),
+          labels: ms.flatMap(([m, n], i) => [{ x: i, y: -4, dy: 16, a: 'middle', t: n, c: 'muted' }, { x: i, y: gain(m), dy: gain(m) >= 0 ? -8 : 16, a: 'middle', t: gain(m).toFixed(1) }]),
+        });
+        stats([['Events', String(c.events), null, 'ink'], ['Crowd vs history, p', pval(c.pMkt), null, c.pMkt < 0.05 ? 'good' : 'muted'], ['Options vs history, p', pval(c.pOpt), null, c.pOpt < 0.05 ? 'good' : 'muted']]);
+      };
+      pick(q(root, '#r-win'), 'Window', [['All', 'all'], ['Daily', 'daily'], ['Weekly', 'weekly'], ['Monthly', 'monthly'], ['Drops 5%+', 'big']], (v) => { k = v; r(); });
+      return r;
+    },
+  },
+  {
     id: 'together', kicker: 'Summary', title: 'What this says',
     body: `<p><b>1. The crowd understands path risk.</b> On a market trading about $1 million a day, retail prices for touch bets are as accurate as the options market's.</p>
       <p><b>2. No mispricing big enough to trade.</b> The crowd sits inside the range of reasonable fair values, with a small long-shot tilt that is smaller than the fee.</p>
       <p><b>3. No cross-venue arbitrage</b> once you check which side of the spread each trade hit.</p>
+      <p><b>4. For risk, market prices beat history</b> on short-window crash odds.</p>
       <p>Together with thin altcoin ladders, where simple models did beat the crowd, the pattern is: <b>enough money makes the crowd good.</b></p>`,
     lab: listHtml([['Most solid', 'Calibration and accuracy: 326 events, outcomes rebuilt from Binance.'], ['Model-dependent', 'Whether the crowd is a cent or two rich or cheap.'], ['Exploratory', 'The executable-sides check on the Kalshi violations.']]),
   },

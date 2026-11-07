@@ -66,3 +66,16 @@ For each trade, Deribit trades in the previous 60 minutes on the two expiries br
 - **Run 4**: the reported run.
 - **Kalshi bound on full data** (run 4 trades reused once Kalshi finished): 262 violations among 129,997 paired trades, on 53 of 228 days, median 6 cents after both fees.
 - **Exploratory check, added after seeing the violations: are they executable?** Kept only pairs at most 60 seconds apart, with Binance moving less than 0.1% between them, and on the sides one would trade against (a Kalshi print where the taker sold the leg we need to sell, and a Polymarket print where the taker bought the touch). 143 violations pass the first two filters and none pass all three. Most violations pair a Polymarket print where someone sold the touch (the bid) with a Kalshi print where someone bought (the ask): they are the two venues' spreads, not a free trade. Over the whole sample, before the time and price filters, only 3 violations were on executable sides.
+
+## Follow-up: do betting markets forecast drawdowns better than history? (fixed 2026-11-07, before it was computed)
+
+A risk platform built on factor models forecasts risk from past volatility. The question here is whether it should also pull in forward-looking prices, from prediction markets or options, to show the chance that BTC falls to a level within a week or month.
+
+**Forecasts, for the same trades as the primary test (run 4 data):**
+- **MKT**: the Polymarket price.
+- **OPT**: the options value used throughout (2 x the smile digital).
+- **HIST**: the same reflection value built from history instead of options: 2 x P(finish beyond K) under a driftless-price lognormal whose daily variance is the HAR estimate from Binance hourly returns (24 x the mean squared hourly log return over the last 1, 7 and 30 days, averaged), using hours completed before the trade.
+
+**Primary (dip markets, the drawdown question):** Brier score of MKT against HIST and of OPT against HIST, share-weighted within each event, events equally weighted, paired differences with a 10-day block bootstrap, Holm over the two.
+
+**Secondary:** the same on reach markets; dip markets by series (daily, weekly, monthly); dip strikes at least 5% below spot; calibration of the three forecasts on dip markets.

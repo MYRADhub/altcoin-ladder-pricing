@@ -34,4 +34,5 @@ test('generated data is complete', () => {
   assert.ok(D.calibration.p.length >= 6 && D.calibration.FAIR.length >= 6);
   for (const k of ['primary', 'GBM barrier', 'digital lower bound']) assert.ok(D.premium[k].reach && D.premium[k].dip);
   assert.ok(D.kalshi.violations > D.kalshi.flat && D.kalshi.flat >= D.kalshi.executable);
+  for (const k of ['all', 'daily', 'weekly', 'monthly', 'big']) assert.ok(D.crash[k].events > 10 && D.crash[k].history > 0);
 });

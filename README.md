@@ -16,6 +16,15 @@ Kalshi lists a daily ladder of contracts for SOL, XRP and DOGE: "will the price 
 
 The plan, every model and every test were written in `research.md` before any model was compared with any outcome. Two amendments, both made before any score, are dated there. The two follow-ups on the direction signal were planned after the main results and are labeled as such.
 
+## What this means for a crypto risk platform
+
+A crypto risk platform built on a factor model forecasts risk mostly from history and covers many coins that have no options market. Both parts of this project speak to that:
+
+1. **Forward-looking risk for coins without options.** Carrying BTC's option-implied volatility to an altcoin through its beta and its own residual risk (the market and residual-volatility structure of the Q-7 model) gave a forward-looking risk estimate that matched ETH's own options almost exactly (correlation 0.998). The same route works for any coin with a price history.
+2. **Market prices beat history for short-window crash odds.** For "will BTC fall to $X today or this week", Polymarket's price and the options value were each about 10% more accurate than the same probability built from BTC's past volatility (part 2, Holm p = 0.001). For monthly windows and drops of 5% or more, history did as well. A risk screen could show market-implied drawdown odds next to its historical stress tests.
+3. **Which crowd prices to trust.** Busy markets (Polymarket's BTC touch markets, Kalshi's ETH ladders) were as accurate as options. Thin ones (Kalshi's DOGE and XRP ladders) were not, and should be used only with a liquidity filter.
+4. **Where regime and crowding signals fit.** The Fear & Greed regime and funding-crowding signals added nothing at horizons of hours to a day, in any of the tests. They belong in attribution and longer-horizon risk, not in short-term forecasts.
+
 ## Why it matters
 
 Prediction markets now list daily price ladders for many coins, but only BTC and ETH have options markets to anchor a fair value. For BTC and ETH, reading these contracts as digital options is established ([Lee, Lee and Lee 2026](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6748186)). Crypto factor models, from market, size and momentum ([Liu, Tsyvinski and Wu 2022](https://doi.org/10.1111/jofi.13119)) to the seven-factor Q-7 model with residual volatility, funding and sentiment regimes (see below), are built to describe risk. This project tests whether such a model can serve as a pricing engine where no options exist. I found no prior work that prices altcoin prediction-market contracts this way.
