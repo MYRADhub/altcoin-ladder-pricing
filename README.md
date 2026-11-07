@@ -18,7 +18,22 @@ The plan, every model and every test were written in `research.md` before any mo
 
 ## Why it matters
 
-Prediction markets now list daily price ladders for many coins, but only BTC and ETH have options markets to anchor a fair value. For BTC and ETH, reading these contracts as digital options is established ([Lee, Lee and Lee 2026](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6748186)). Crypto factor models, from market, size and momentum ([Liu, Tsyvinski and Wu 2022](https://doi.org/10.1111/jofi.13119)) to practitioner models with residual volatility, funding and sentiment regimes, are built to describe risk. This project tests whether such a model can serve as a pricing engine where no options exist. I found no prior work that prices altcoin prediction-market contracts this way.
+Prediction markets now list daily price ladders for many coins, but only BTC and ETH have options markets to anchor a fair value. For BTC and ETH, reading these contracts as digital options is established ([Lee, Lee and Lee 2026](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6748186)). Crypto factor models, from market, size and momentum ([Liu, Tsyvinski and Wu 2022](https://doi.org/10.1111/jofi.13119)) to the seven-factor Q-7 model with residual volatility, funding and sentiment regimes (see below), are built to describe risk. This project tests whether such a model can serve as a pricing engine where no options exist. I found no prior work that prices altcoin prediction-market contracts this way.
+
+## How this builds on the Q-7 model
+
+This project starts from the Q-7 model ([Babayev and Aliyev 2026, "Crypto Has Fundamentals: A Seven-Factor Model for Digital Asset Returns"](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6818558)). Q-7 explains crypto returns with seven factors (market, size, momentum, on-chain quality, value, residual volatility and perpetual funding sentiment) and reports that some factor premia depend on the Fear & Greed regime, most strongly that short-term reversal pays in fear and loses in greed. Q-7 is built to explain returns and attribute portfolio performance. This project asks a different question: do its ingredients help price short-dated prediction-market contracts, and do its signals predict when the betting crowd is wrong?
+
+| Q-7 ingredient | How it was used here | Result |
+| --- | --- | --- |
+| Market factor (beta to BTC) | Maps BTC's option-implied volatility to each altcoin (part 1) | Works: on ETH it matched ETH's own options (correlation 0.998) |
+| Residual volatility | The altcoin's own risk on top of its BTC exposure (part 1) | Works, but no better than the coin's own total volatility |
+| Funding sentiment | Scales residual risk when futures are crowded (part 1); predicts the crowd's pricing errors on Kalshi BTC ladders (pilot) and Polymarket touch premiums (part 2) | No improvement, no prediction |
+| Fear & Greed regimes | The same three uses | No improvement, no prediction |
+| Reversal in fear, Q-7's headline regime result | Shifts the center of each ladder's price distribution (part 1 follow-up); tested on 2020 to 2025 daily moves of SOL, XRP and DOGE | The shift is a fraction of a cent; not significant on earlier data |
+| Size, momentum, on-chain quality, value | Not used: they rank tokens against each other, while each ladder is one coin over hours | |
+
+The short version: Q-7's market and residual-volatility structure is a sound way to carry an options forecast to coins without options, but its regime and crowding signals add nothing at a horizon of hours to a day. That fits its design for explaining returns across tokens rather than pricing one coin over a few hours.
 
 ## Data
 
